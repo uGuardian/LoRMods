@@ -27,6 +27,7 @@ namespace FinallyBeyondTheTime
 
 		public override void OnRoundEndTheLast()
 		{
+			this.CleanUp();
 			this.CheckPhase();
 			this.CheckFloor();
 		}
@@ -468,6 +469,10 @@ namespace FinallyBeyondTheTime
 		{
 			if (BattleObjectManager.instance.GetAliveList(Faction.Player).Count <= 0)
 			{
+				foreach (BattleUnitModel battleUnitModel in BattleObjectManager.instance.GetList(Faction.Player))
+				{
+					BattleObjectManager.instance.UnregisterUnit(battleUnitModel);
+				}
 				BattleTeamModel battleTeamModel = (BattleTeamModel)typeof(StageController).GetField("_librarianTeam", AccessTools.all).GetValue(Singleton<StageController>.Instance);
 				if (this.remains.Count > 1)
 				{
@@ -548,6 +553,16 @@ namespace FinallyBeyondTheTime
 				if (this.phase >= 13)
 				{
 					battleUnitModel3.bufListDetail.GetActivatedBufList().Find((BattleUnitBuf x) => x is BattleUnitBuf_KeterFinal_Cogito).Destroy();
+				}
+			}
+		}
+		private void CleanUp()
+		{
+			foreach (BattleUnitModel battleUnitModel in BattleObjectManager.instance.GetList(Faction.Enemy))
+			{
+				if (battleUnitModel.IsDead())
+				{
+					BattleObjectManager.instance.UnregisterUnit(battleUnitModel);
 				}
 			}
 		}
