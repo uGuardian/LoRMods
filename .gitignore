@@ -448,4 +448,7 @@ $RECYCLE.BIN/
 ## All DLLs
 *.dll
 /.vscode/
+
+Ignore libs other than note
 /libs/*
+!/libs/Libs.txt
