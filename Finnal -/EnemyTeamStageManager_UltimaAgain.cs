@@ -11,6 +11,7 @@ namespace FinallyBeyondTheTime
 		public override void OnWaveStart()
 		{
 			this.phase = 0;
+			this.currentFloor = SephirahType.Keter;
 			this._finished = false;
 			this._angelaappears = false;
 			this.remains.Clear();
@@ -27,9 +28,13 @@ namespace FinallyBeyondTheTime
 
 		public override void OnRoundEndTheLast()
 		{
-			this.CleanUp();
 			this.CheckPhase();
 			this.CheckFloor();
+			// Phases from T3 SotC onwards have more complicated mechanics and less characters, so we stop cleaning every round just to be sure
+			if (this.phase < 7)
+			{
+				this.CleanUp();
+			}
 		}
 
 		public override bool IsStageFinishable()
@@ -408,8 +413,14 @@ namespace FinallyBeyondTheTime
 			if (BattleObjectManager.instance.GetAliveList(Faction.Enemy).Count <= 0)
 			{
 				this.phase++;
+				Debug.LogError("Finall: Starting Phase Transition, new phase is " + this.phase);
 				if (this.phase <= 12)
 				{
+					// We're between phases, so clean up if it wasn't done on Round End
+					if (this.phase >= 7)
+					{
+						this.CleanUp();
+					}
 					foreach (BattleUnitModel battleUnitModel in BattleObjectManager.instance.GetAliveList(Faction.Player))
 					{
 						battleUnitModel.RecoverHP(20);
@@ -469,19 +480,33 @@ namespace FinallyBeyondTheTime
 		{
 			if (BattleObjectManager.instance.GetAliveList(Faction.Player).Count <= 0)
 			{
+				Debug.LogError("Finall: Starting Floor Transition, changing from " + this.currentFloor + " to " + this.remains[0].Sephirah);
+				Debug.LogError("Finall: Cleaning current floor...");
 				foreach (BattleUnitModel battleUnitModel in BattleObjectManager.instance.GetList(Faction.Player))
 				{
 					BattleObjectManager.instance.UnregisterUnit(battleUnitModel);
+					// Debug.LogError("Finall: Unregistered Librarian " + battleUnitModel.id);
 				}
+				Debug.LogError("Finall: Setting up floor...");
 				BattleTeamModel battleTeamModel = (BattleTeamModel)typeof(StageController).GetField("_librarianTeam", AccessTools.all).GetValue(Singleton<StageController>.Instance);
+				/* Debug.LogError("Finall: battleTeamModel includes:");
+				foreach (BattleUnitModel battleUnitModel in battleTeamModel.GetList())
+				{
+					Debug.LogError("Finall: battleUnitModel.id: " + battleUnitModel.id);
+				} */
 				if (this.remains.Count > 1)
 				{
 					Singleton<StageController>.Instance.SetCurrentSephirah(this.remains[0].Sephirah);
+					// MapChange needs to be called before remains is updated
+					this.MapChange();
 					this.remains.Remove(this.remains[0]);
 					StageLibraryFloorModel currentStageFloorModel = Singleton<StageController>.Instance.GetCurrentStageFloorModel();
+					// Debug.LogError("Finall: currentStageFloorModel.GetUnitBattleDataList includes:");
 					for (int i = 0; i < currentStageFloorModel.GetUnitBattleDataList().Count; i++)
 					{
+						// Debug.LogError("Finall: Count Index: " + i);
 						BattleUnitModel battleUnitModel = Singleton<StageController>.Instance.CreateLibrarianUnit_fromBattleUnitData(i);
+						// Debug.LogError("Finall: CreateLibrarianUnit: " + battleUnitModel.id);
 						battleUnitModel.OnWaveStart();
 						battleUnitModel.emotionDetail.SetEmotionLevel(Mathf.Min(this.phase + 1, 5));
 						battleUnitModel.cardSlotDetail.RecoverPlayPoint(5);
@@ -495,6 +520,7 @@ namespace FinallyBeyondTheTime
 					{
 						this._angelaappears = true;
 						Singleton<StageController>.Instance.SetCurrentSephirah(SephirahType.Keter);
+						this.MapChange();
 						StageLibraryFloorModel currentStageFloorModel2 = Singleton<StageController>.Instance.GetCurrentStageFloorModel();
 						UnitDataModel unitDataModel = new UnitDataModel(9100501, SephirahType.Keter, true);
 						BattleUnitModel battleUnitModel2 = BattleObjectManager.CreateDefaultUnit(Faction.Player);
@@ -515,6 +541,9 @@ namespace FinallyBeyondTheTime
 						SingletonBehavior<UICharacterRenderer>.Instance.SetCharacter(battleUnitModel2.UnitData.unitData, 0, true);
 					}
 				}
+				// Refresh UI after floor setup is complete
+				BattleObjectManager.instance.InitUI();
+				Debug.LogError("Finall: Floor Setup Complete");
 			}
 			bool angelaappears = this._angelaappears;
 			if (angelaappears)
@@ -558,18 +587,54 @@ namespace FinallyBeyondTheTime
 		}
 		private void CleanUp()
 		{
+			Debug.LogError("Finall: Cleaning dead enemies...");
+			int i = 5;
 			foreach (BattleUnitModel battleUnitModel in BattleObjectManager.instance.GetList(Faction.Enemy))
 			{
 				if (battleUnitModel.IsDead())
 				{
 					BattleObjectManager.instance.UnregisterUnit(battleUnitModel);
+					// Debug.LogError("Finall: Unregistered Enemy: " + battleUnitModel.id);
+				} else {
+					// We use this opportunity to reregister living units to lower registers for partial UI functionality, because we might as well
+					// Debug.LogError("Finall: Count Index: " + i);
+					SingletonBehavior<UICharacterRenderer>.Instance.SetCharacter(battleUnitModel.UnitData.unitData, i++, true);
+					// Debug.LogError("Finall: SetCharacter Enemy: " + battleUnitModel.id);
+					// i = ((i+1)%6)+5; // Looped register function, slightly changes display bugs
 				}
 			}
+			// We refresh the UI after the registrations are all done
+			BattleObjectManager.instance.InitUI();
+			Debug.LogError("Finall: Cleaning Finished");
+		}
+		private void MapChange()
+		{
+			//If the floor is angela, make it Keter, otherwise base on this.remains
+			if (!this._angelaappears)
+			{
+				this.currentFloor = this.remains[0].Sephirah;
+			} else {
+				this.currentFloor = SephirahType.Keter;
+			}
+			Debug.LogError("Finall: Changing map, new map is " + this.currentFloor);
+			// ChangeToSephirahMap called for transition effect
+			SingletonBehavior<BattleSceneRoot>.Instance.ChangeToSephirahMap(this.currentFloor, true);
+			// EndBattle only terminates the map structure, not the battle itself. Used to clear the map effectively.
+			SingletonBehavior<BattleSceneRoot>.Instance.EndBattle(true);
+			// Immediately CheckTheme to make the music not temporarily stall.
+			SingletonBehavior<BattleSoundManager>.Instance.CheckTheme();
+			// Emulate map related init functions.
+			Singleton<StageController>.Instance.InitializeMap();
+			Singleton<StageController>.Instance.GetStageModel().GetFloor(this.currentFloor).SetEmotionTeamUnit();
+			SingletonBehavior<HexagonalMapManager>.Instance.OnRoundStart();
+			SingletonBehavior<HexagonalMapManager>.Instance.ResetMapSetting();
+			SingletonBehavior<BattleCamManager>.Instance.ResetCamSetting();
 		}
 
 		private BattleUnitModel pt = new BattleUnitModel(50035);
 
 		private int phase;
+		private SephirahType currentFloor;
 
 		private bool _finished;
 
