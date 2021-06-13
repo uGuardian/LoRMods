@@ -416,11 +416,6 @@ namespace FinallyBeyondTheTime
 				Debug.LogError("Finall: Starting Phase Transition, new phase is " + this.phase);
 				if (this.phase <= 12)
 				{
-					// We're between phases, so clean up if it wasn't done on Round End
-					if (this.phase >= 7)
-					{
-						this.CleanUp();
-					}
 					foreach (BattleUnitModel battleUnitModel in BattleObjectManager.instance.GetAliveList(Faction.Player))
 					{
 						battleUnitModel.RecoverHP(20);
@@ -455,6 +450,11 @@ namespace FinallyBeyondTheTime
 						{
 							this.pt = battleUnitModel2;
 						}
+					}
+					// We're between phases, so clean up if it won't be done on Round End
+					if (this.phase >= 7)
+					{
+						this.CleanUp();
 					}
 				}
 				else
