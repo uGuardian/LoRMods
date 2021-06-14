@@ -618,7 +618,7 @@ namespace FinallyBeyondTheTime
 			}
 			Debug.LogError("Finall: Changing map, new map is " + this.currentFloor);
 			// ChangeToSephirahMap called for transition effect
-			SingletonBehavior<BattleSceneRoot>.Instance.ChangeToSephirahMap(this.currentFloor, true);
+			//SingletonBehavior<BattleSceneRoot>.Instance.ChangeToSephirahMap(this.currentFloor, true);
 			// EndBattle only terminates the map structure, not the battle itself. Used to clear the map effectively.
 			SingletonBehavior<BattleSceneRoot>.Instance.EndBattle(true);
 			// Immediately CheckTheme to make the music not temporarily stall.
