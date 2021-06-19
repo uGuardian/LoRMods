@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using HarmonyLib;
 using UI;
 using UnityEngine;
@@ -8,10 +9,34 @@ namespace FinallyBeyondTheTime
 {
 	public class EnemyTeamStageManager_UltimaAgain : EnemyTeamStageManager
 	{
+		public static bool FinallConfig(string settingKey)
+		{
+			string configFile = (Application.dataPath + "/BaseMods/Finnal -/Finnal.ini");
+			string[] config = new string[4];
+			if (!File.Exists(configFile))
+			{
+				// If the file somehow does not exist, which should never be the case due to generation during the Harmony Patch, assume false for all.
+				Debug.LogError("Finall: Config file does not exist!" + Environment.NewLine + "Assuming " + settingKey + " = False");
+				return false;
+			} else {
+				config = File.ReadAllLines(configFile);
+			}
+			try {
+				bool settingResult = System.Convert.ToBoolean(config[Array.IndexOf(config, settingKey)+1]);
+				Debug.LogError("Finall: " + settingKey + " = " + settingResult);
+				return settingResult;
+			} catch {
+				Debug.LogError(ex.Message + Environment.NewLine + ex.StackTrace);
+				Debug.LogError("Finall: Error occured in config check for variable " + settingKey + "!" + Environment.NewLine + "Assuming " + settingKey + " = False");
+				return false;
+			}
+		}
 		public override void OnWaveStart()
 		{
 			this.phase = 0;
-			this.currentFloor = SephirahType.Keter;
+			this.currentFloor = Singleton<StageController>.Instance.GetCurrentStageFloorModel().Sephirah;
+			Debug.LogError("Finall: Initial floor is " + this.currentFloor);
+			FinallConfig("diceSpeedUp"); // Outputs the current setting into the log, does nothing else
 			this._finished = false;
 			this._angelaappears = false;
 			this.remains.Clear();
@@ -21,8 +46,18 @@ namespace FinallyBeyondTheTime
 				{
 					StageLibraryFloorModel stageLibraryFloorModel = new StageLibraryFloorModel();
 					stageLibraryFloorModel.Init(Singleton<StageController>.Instance.GetStageModel(), libraryFloorModel, false);
-					this.remains.Add(stageLibraryFloorModel);
+					if (stageLibraryFloorModel.Sephirah != this.currentFloor || this.currentFloor == SephirahType.Keter)
+					{
+						this.remains.Add(stageLibraryFloorModel);
+					} else {
+						Debug.LogError("Finall: Floor list skipping over " + this.currentFloor);
+					}
 				}
+			}
+			if (this.currentFloor != SephirahType.Keter)
+			{
+				Debug.LogError("Finall: Inserting Keter at top of floor list");
+				this.remains.Insert(0, this.remains[this.remains.Count - 1]);
 			}
 		}
 
@@ -50,7 +85,7 @@ namespace FinallyBeyondTheTime
 				if (passiveAbilityBase != null && !passiveAbilityBase.destroyed)
 				{
 					List<BattleUnitModel> aliveList = BattleObjectManager.instance.GetAliveList(Faction.Player);
-					if (aliveList.Count > 0)
+					if (aliveList.Count > 1 || !FinallConfig("childImmobilizeNerf") && aliveList.Count > 0)
 					{
 						RandomUtil.SelectOne<BattleUnitModel>(aliveList).bufListDetail.AddKeywordBufThisRoundByCard(KeywordBuf.Stun, 1, null);
 						break;
@@ -497,9 +532,6 @@ namespace FinallyBeyondTheTime
 				if (this.remains.Count > 1)
 				{
 					Singleton<StageController>.Instance.SetCurrentSephirah(this.remains[0].Sephirah);
-					// MapChange needs to be called before remains is updated
-					this.MapChange();
-					this.remains.Remove(this.remains[0]);
 					StageLibraryFloorModel currentStageFloorModel = Singleton<StageController>.Instance.GetCurrentStageFloorModel();
 					// Debug.LogError("Finall: currentStageFloorModel.GetUnitBattleDataList includes:");
 					for (int i = 0; i < currentStageFloorModel.GetUnitBattleDataList().Count; i++)
@@ -513,6 +545,9 @@ namespace FinallyBeyondTheTime
 						battleUnitModel.allyCardDetail.DrawCards(6);
 						SingletonBehavior<UICharacterRenderer>.Instance.SetCharacter(battleUnitModel.UnitData.unitData, i, true);
 					}
+					// MapChange needs to be called before remains is updated
+					this.MapChange();
+					this.remains.Remove(this.remains[0]);
 				}
 				else
 				{
@@ -520,7 +555,6 @@ namespace FinallyBeyondTheTime
 					{
 						this._angelaappears = true;
 						Singleton<StageController>.Instance.SetCurrentSephirah(SephirahType.Keter);
-						this.MapChange();
 						StageLibraryFloorModel currentStageFloorModel2 = Singleton<StageController>.Instance.GetCurrentStageFloorModel();
 						UnitDataModel unitDataModel = new UnitDataModel(9100501, SephirahType.Keter, true);
 						BattleUnitModel battleUnitModel2 = BattleObjectManager.CreateDefaultUnit(Faction.Player);
@@ -539,6 +573,7 @@ namespace FinallyBeyondTheTime
 						battleUnitModel2.cardSlotDetail.RecoverPlayPoint(5);
 						battleUnitModel2.allyCardDetail.DrawCards(4);
 						SingletonBehavior<UICharacterRenderer>.Instance.SetCharacter(battleUnitModel2.UnitData.unitData, 0, true);
+						this.MapChange();
 					}
 				}
 				// Refresh UI after floor setup is complete

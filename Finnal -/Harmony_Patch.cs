@@ -27,6 +27,12 @@ namespace FinallyBeyondTheTime
 				// harmony.Patch(typeof(BattleObjectManager).GetMethod("InitUI", AccessTools.all), new HarmonyMethod(method), null, null, null);
 				MethodInfo emotionCoinExceptionSuppressor = typeof(Harmony_Patch).GetMethod("EmotionCoinExceptionSuppressor");
 				harmony.Patch(typeof(BattleEmotionCoinUI).GetMethod("Init", AccessTools.all), null, null, null, new HarmonyMethod(emotionCoinExceptionSuppressor));
+				if (this.FinallConfig("diceSpeedUp") == true) // If enabled, remove normal restrictive noDelay behavior and re-add the behavior via the unused command, while also adding a new trigger for the stage
+				{
+					MethodInfo enableNoDelay_Pre = typeof(Harmony_Patch).GetMethod("EnableNoDelay_Pre");
+					MethodInfo enableNoDelay_Trans = typeof(Harmony_Patch).GetMethod("EnableNoDelay_Trans");
+					harmony.Patch(typeof(RencounterManager).GetMethod("StartRencounter", AccessTools.all), new HarmonyMethod(enableNoDelay_Pre), null, new HarmonyMethod(enableNoDelay_Trans), null);
+				}
 			}
 			catch (Exception ex)
 			{
@@ -86,6 +92,63 @@ namespace FinallyBeyondTheTime
 		public static Exception EmotionCoinExceptionSuppressor()
 		{
 			return null;
+		}
+
+		public static void EnableNoDelay_Pre(RencounterManager __instance)
+		{
+			if (Singleton<StageController>.Instance.IsTwistedArgaliaBattleEnd() || (Singleton<StageController>.Instance.GetStageModel().ClassInfo.id == 600013))
+			{
+				__instance.SetNodelay(true);
+			}
+			else
+			{
+				__instance.SetNodelay(false);
+			}
+		}
+		public static IEnumerable<CodeInstruction> EnableNoDelay_Trans(IEnumerable<CodeInstruction> instructions)
+		{
+			// File.WriteAllText(Application.dataPath + "/BaseMods/Finnal -/AgainHPTranspiler.txt", "Transpiler starting");
+			var startIndex = -1;
+    		var endIndex = -1;
+			var codes = new List<CodeInstruction>(instructions);
+			for (var i = 0; i < codes.Count; i++)
+			{
+				if (codes[i].opcode == OpCodes.Ldarg_0 && codes[i+12].opcode == OpCodes.Stfld)
+				{
+					startIndex = (i);
+					endIndex = (i+12);
+					// File.WriteAllText(Application.dataPath + "/BaseMods/Finnal -/AgainHPIndicies.txt", (startIndex.ToString() + " " + endIndex.ToString()));
+					break;
+				}
+			}
+			if (startIndex > -1)
+			{
+				for (var o = startIndex; o <= endIndex; o++)
+				{
+					codes[o].opcode = OpCodes.Nop;
+				}
+				// File.WriteAllText(Application.dataPath + "/BaseMods/Finnal -/AgainHPComplete.txt", "Transpiler complete");
+			} else {
+				// File.WriteAllText(Application.dataPath + "/BaseMods/Finnal -/AgainHPMissing.txt", "Transpiler position not found");
+			}
+			return codes.AsEnumerable();
+		}
+		private bool FinallConfig(string settingKey)
+		{
+			string configFile = (Application.dataPath + "/BaseMods/Finnal -/Finnal.ini");
+			string[] config = new string[4];
+			if (!File.Exists(configFile))
+			{
+				config[0] = ("childImmobilizeNerf");
+				config[1] = ("False");
+				config[2] = ("diceSpeedUp");
+				config[3] = ("True");
+				File.WriteAllLines(configFile, config);
+			} else {
+				config = File.ReadAllLines(configFile);
+			}
+			bool settingResult = System.Convert.ToBoolean(config[Array.IndexOf(config, settingKey)+1]);
+			return settingResult;
 		}
 	}
 }
