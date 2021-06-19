@@ -25,7 +25,7 @@ namespace FinallyBeyondTheTime
 				bool settingResult = System.Convert.ToBoolean(config[Array.IndexOf(config, settingKey)+1]);
 				Debug.LogError("Finall: " + settingKey + " = " + settingResult);
 				return settingResult;
-			} catch {
+			} catch (Exception ex) {
 				Debug.LogError(ex.Message + Environment.NewLine + ex.StackTrace);
 				Debug.LogError("Finall: Error occured in config check for variable " + settingKey + "!" + Environment.NewLine + "Assuming " + settingKey + " = False");
 				return false;
