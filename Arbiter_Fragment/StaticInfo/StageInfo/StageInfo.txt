@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<StageXmlRoot xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Stage id="181005">
+    <Name>Zena</Name>
+    <Wave>
+      <AvailableUnit>5</AvailableUnit>
+      <Unit>181005</Unit>
+    </Wave>
+    <FloorNum>1</FloorNum>
+    <Invitation Combine="BookRecipe">
+      <Book>31</Book>
+      <Book>250022</Book>
+    </Invitation>
+    <Chapter>7</Chapter>
+    <Condition>
+      <Stage>60007</Stage>
+    </Condition>
+  </Stage>
+</StageXmlRoot>
