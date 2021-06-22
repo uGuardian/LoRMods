@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BookUseXmlRoot xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <BookUse ID="181005">
+    <TextId>dropbook_Fragment</TextId>
+    <Chapter>7</Chapter>
+    <Exp>1</Exp>
+    <EquipProb>1</EquipProb>
+	<DropItem Type="Equip">181005</DropItem>
+  </BookUse>
+</BookUseXmlRoot>
