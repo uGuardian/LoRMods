@@ -452,3 +452,5 @@ $RECYCLE.BIN/
 Ignore libs other than note
 /libs/*
 !/libs/Libs.txt
+!/libs/Managed/.keep
+!/libs/BepInEx/.keep
