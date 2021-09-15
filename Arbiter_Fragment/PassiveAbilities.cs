@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using HarmonyLib;
 using UnityEngine;
+using GameSave;
 
 namespace ArbiterFragment
 {
-    public class PassiveAbility_181005 : PassiveAbilityBase
+    public class PassiveAbility_Fragment_of_an_Arbiter : PassiveAbilityBase
     {
+        public static string Desc = "Binah Only: At emotion level 3 changes to buffed version";
         public override string debugDesc
         {
             get
@@ -64,7 +65,7 @@ namespace ArbiterFragment
                 this.owner.allyCardDetail.ExhaustAllCards();
                 foreach (BattleDiceCardModel card in hand)
                 {
-                    int id = card.GetID();
+                    int id = card.GetID().id;
                     string name = card.GetName();
                     // Debug.LogError("ArbiterFragment: Exchanging (hand) " + name);
                     switch (id)
@@ -92,7 +93,7 @@ namespace ArbiterFragment
                 }
                 foreach (BattleDiceCardModel card in deck)
                 {
-                    int id = card.GetID();
+                    int id = card.GetID().id;
                     string name = card.GetName();
                     // Debug.LogError("ArbiterFragment: Exchanging (deck) " + name);
                     switch (id)
@@ -150,7 +151,7 @@ namespace ArbiterFragment
         }
         public static int? ArbiterFragmentConfig(string settingKey)
 		{
-			string configFile = (Application.dataPath + "/BaseMods/Arbiter_Fragment/Arbiter_Fragment.ini");
+			string configFile = SaveManager.GetFullPath("Arbiter_Fragment.ini");
 			string[] config = new string[12];
 			if (!File.Exists(configFile))
 			{
