@@ -449,6 +449,14 @@ $RECYCLE.BIN/
 *.dll
 /.vscode/
 
-Ignore libs other than note
+## Ignore libs other than note
 /libs/*
 !/libs/Libs.txt
+
+# Keep lib subfolders
+!/libs/Managed
+!/libs/BepInEx/
+/libs/Managed/*
+/libs/BepInEx/*
+!/libs/Managed/.keep
+!libs/BepInEx/.keep
