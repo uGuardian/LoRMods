@@ -5,22 +5,22 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony.dll">
-      <HintPath>F:\SteamLibrary\steamapps\common\Library Of Ruina\LibraryOfRuina_Data\Managed\0Harmony.dll</HintPath>
+      <HintPath>..\libs\BepInEx\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp.dll">
-      <HintPath>F:\SteamLibrary\steamapps\common\Library Of Ruina\LibraryOfRuina_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\libs\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib.dll">
-      <HintPath>F:\SteamLibrary\steamapps\common\Library Of Ruina\LibraryOfRuina_Data\Managed\mscorlib.dll</HintPath>
+      <HintPath>..\libs\Managed\mscorlib.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.dll">
-      <HintPath>F:\SteamLibrary\steamapps\common\Library Of Ruina\LibraryOfRuina_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\libs\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule.dll">
-      <HintPath>F:\SteamLibrary\steamapps\common\Library Of Ruina\LibraryOfRuina_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\libs\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI.dll">
-      <HintPath>F:\SteamLibrary\steamapps\common\Library Of Ruina\LibraryOfRuina_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\libs\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Content Include="EnemyTeamStageManager_UltimaAgain.cs" />
     <Content Include="Harmony_Patch.cs" />
