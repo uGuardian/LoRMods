@@ -1,7 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <TargetFramework>net472</TargetFramework>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony.dll">

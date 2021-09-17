@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FinallyBeyondTheTime
 {
-	public class PassiveAbility_170101 : PassiveAbilityBase
+	public class PassiveAbility_170101_Finnal : PassiveAbilityBase
 	{
 		public override void OnWaveStart()
 		{

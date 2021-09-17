@@ -2,7 +2,7 @@ using System;
 
 namespace FinallyBeyondTheTime
 {
-	public class PassiveAbility_180002 : PassiveAbilityBase
+	public class PassiveAbility_180002_Finnal : PassiveAbilityBase
 	{
 		// (get) Token: 0x06000035 RID: 53 RVA: 0x00004A5C File Offset: 0x00002C5C
 		public override bool isHide
@@ -184,6 +184,18 @@ namespace FinallyBeyondTheTime
 			}
 			return base.ChangeAttackTarget(card, idx);
 		}
+
+		private const int _NORMAL1_CARD = 706001;
+
+		private const int _NORMAL2_CARD = 706002;
+
+		private const int _R_CARD = 706003;
+
+		private const int _W_CARD = 706004;
+
+		private const int _ALL_CARD = 706005;
+
+		private const int _K_CARD = 706006;
 
 		private EnemyTeamStageManager_FinalFinal _stageManager;
 	}
