@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FinallyBeyondTheTime
 {
-	public class PassiveAbility_250227 : PassiveAbilityBase
+	public class PassiveAbility_250227_Finnal : PassiveAbilityBase
 	{
 		public override int SpeedDiceNumAdder()
 		{
@@ -42,7 +42,8 @@ namespace FinallyBeyondTheTime
 
 		public override void OnRoundStart()
 		{
-			if (!(this.owner.UnitData.floorBattleData.param2 > 0))
+			// if (!(this.owner.UnitData.floorBattleData.param2 > 0))
+			if (false)
 			{
 				if (this._teleportReady || this.owner.hp <= (float)this._teleportCondition)
 				{
@@ -205,7 +206,10 @@ namespace FinallyBeyondTheTime
 			{
 				this._alreayUsed.Clear();
 			}
-			int param = this.owner.UnitData.floorBattleData.param2;
+			int param = 0;
+			try {
+				param = this.owner.UnitData.floorBattleData.param2;
+			} catch { Debug.LogError("Finall: PurpleTear failed to find param2"); }
 			if (param > 0 && !this._alreayUsed.Contains(PurpleStance.Defense))
 			{
 				this._alreayUsed.Add(PurpleStance.Defense);

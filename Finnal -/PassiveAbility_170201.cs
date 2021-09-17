@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FinallyBeyondTheTime
 {
-	public class PassiveAbility_170201 : PassiveAbilityBase
+	public class PassiveAbility_170201_Finnal : PassiveAbilityBase
 	{
 		// (get) Token: 0x06000045 RID: 69 RVA: 0x00005274 File Offset: 0x00003474
 		public override bool isHide

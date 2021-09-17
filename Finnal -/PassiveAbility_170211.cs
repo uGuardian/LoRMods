@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FinallyBeyondTheTime
 {
-	public class PassiveAbility_170211 : PassiveAbilityBase
+	public class PassiveAbility_170211_Finnal : PassiveAbilityBase
 	{
 		public override void OnRoundStart()
 		{

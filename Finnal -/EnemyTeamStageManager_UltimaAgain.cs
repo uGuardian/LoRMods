@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using HarmonyLib;
+using System.Linq;
 using UI;
 using UnityEngine;
+using GameSave;
 
 namespace FinallyBeyondTheTime
 {
@@ -11,16 +12,17 @@ namespace FinallyBeyondTheTime
 	{
 		public static bool FinallConfig(string settingKey)
 		{
-			string configFile = (Application.dataPath + "/BaseMods/Finnal -/Finnal.ini");
+			string configFile = SaveManager.GetFullPath("Finnal.ini");
 			string[] config = new string[4];
 			if (!File.Exists(configFile))
 			{
-				// If the file somehow does not exist, which should never be the case due to generation during the Harmony Patch, assume false for all.
-				Debug.LogError("Finall: Config file does not exist!" + Environment.NewLine + "Assuming " + settingKey + " = False");
-				return false;
-			} else {
-				config = File.ReadAllLines(configFile);
+				config[0] = ("childImmobilizeNerf");
+				config[1] = ("False");
+				config[2] = ("diceSpeedUp");
+				config[3] = ("True");
+				File.WriteAllLines(configFile, config);
 			}
+			config = File.ReadAllLines(configFile);
 			try {
 				bool settingResult = System.Convert.ToBoolean(config[Array.IndexOf(config, settingKey)+1]);
 				Debug.LogError("Finall: " + settingKey + " = " + settingResult);
@@ -37,7 +39,6 @@ namespace FinallyBeyondTheTime
 			this.currentFloor = Singleton<StageController>.Instance.GetCurrentStageFloorModel().Sephirah;
 			Debug.LogError("Finall: Initial floor is " + this.currentFloor);
 			FinallConfig("diceSpeedUp"); // Outputs the current setting into the log, does nothing else
-			this._finished = false;
 			this._angelaappears = false;
 			this.remains.Clear();
 			foreach (LibraryFloorModel libraryFloorModel in LibraryModel.Instance.GetOpenedFloorList())
@@ -59,17 +60,20 @@ namespace FinallyBeyondTheTime
 				Debug.LogError("Finall: Inserting Keter at top of floor list");
 				this.remains.Insert(0, this.remains[this.remains.Count - 1]);
 			}
+			// finnalFormation = new FormationModel(Singleton<StageController>.Instance.GetCurrentWaveModel().GetFormation().XmlInfo);
 		}
 
 		public override void OnRoundEndTheLast()
 		{
-			this.CheckPhase();
 			this.CheckFloor();
 			// Phases from T3 SotC onwards have more complicated mechanics and less characters, so we stop cleaning every round just to be sure
 			if (this.phase < 7)
 			{
 				this.CleanUp();
+			} else {
+				this.CleanUp(true);
 			}
+			this.CheckPhase();
 		}
 
 		public override bool IsStageFinishable()
@@ -92,6 +96,10 @@ namespace FinallyBeyondTheTime
 					}
 					break;
 				}
+				// Debug.LogError(SingletonBehavior<HexagonalMapManager>.Instance.CellToWorldPos(battleUnitModel.formationCellPos + SingletonBehavior<HexagonalMapManager>.Instance.CenterCell));
+				// Debug.LogError(battleUnitModel.formationCellPos);
+				// Debug.LogError(SingletonBehavior<HexagonalMapManager>.Instance.CenterCell);
+				// battleUnitModel.view.WorldPosition = new Vector3Int(RandomUtil.Range(-48, 0), 0, RandomUtil.Range(-30, 12));
 			}
 		}
 
@@ -447,6 +455,10 @@ namespace FinallyBeyondTheTime
 		{
 			if (BattleObjectManager.instance.GetAliveList(Faction.Enemy).Count <= 0)
 			{
+				// We're between phases, so clean up if it hasn't already been done.
+				if (this.phase >= 7) {
+					this.CleanUp();
+				}
 				this.phase++;
 				Debug.LogError("Finall: Starting Phase Transition, new phase is " + this.phase);
 				if (this.phase <= 12)
@@ -459,38 +471,54 @@ namespace FinallyBeyondTheTime
 						battleUnitModel.cardSlotDetail.RecoverPlayPoint(4);
 						battleUnitModel.allyCardDetail.DrawCards(2);
 					}
-					BattleTeamModel battleTeamModel = (BattleTeamModel)typeof(StageController).GetField("_enemyTeam", AccessTools.all).GetValue(Singleton<StageController>.Instance);
+					int index = 0;
+					bool loop = false;
 					foreach (int num in this.GetPhaseGuest(this.phase))
 					{
-						EnemyUnitClassInfo data = Singleton<EnemyUnitClassInfoList>.Instance.GetData(num);
-						UnitBattleDataModel unitBattleDataModel = UnitBattleDataModel.CreateUnitBattleDataByEnemyUnitId(Singleton<StageController>.Instance.GetStageModel(), data.id);
-						UnitDataModel unitData = unitBattleDataModel.unitData;
-						BattleUnitModel battleUnitModel2 = BattleObjectManager.CreateDefaultUnit(Faction.Enemy);
-						battleUnitModel2.index = 0;
-						battleUnitModel2.formation = Singleton<StageController>.Instance.GetStageModel().GetWave(1).GetFormationPosition(battleUnitModel2.index);
-						if (!unitBattleDataModel.isDead)
-						{
-							battleUnitModel2.grade = unitData.grade;
-							battleUnitModel2.SetUnitData(unitBattleDataModel);
-							battleUnitModel2.OnDispose();
-							battleTeamModel.AddUnit(battleUnitModel2);
-							BattleObjectManager.instance.RegisterUnit(battleUnitModel2);
-							battleUnitModel2.passiveDetail.OnUnitCreated();
-							battleUnitModel2.passiveDetail.OnWaveStart();
-							battleUnitModel2.emotionDetail.SetEmotionLevel(Mathf.Min(this.phase + 1, 5));
-							battleUnitModel2.cardSlotDetail.RecoverPlayPoint(5);
-							battleUnitModel2.allyCardDetail.DrawCards(4);
-						}
+						Singleton<StageController>.Instance.AddNewUnit(Faction.Enemy, num, index, -1);
+						BattleUnitModel battleUnitModel = BattleObjectManager.instance.GetUnitWithIndex(Faction.Enemy, index);
+						PassiveReplacer(battleUnitModel);
+						battleUnitModel.passiveDetail.OnUnitCreated();
+						battleUnitModel.passiveDetail.OnWaveStart();
+						battleUnitModel.emotionDetail.SetEmotionLevel(Mathf.Min(this.phase + 1, 5));
+						battleUnitModel.cardSlotDetail.RecoverPlayPoint(5);
+						battleUnitModel.allyCardDetail.DrawCards(4);
 						if (num == 50035)
 						{
-							this.pt = battleUnitModel2;
+							this.pt = battleUnitModel;
 						}
+						if (index == 4 && loop == false) {
+							Debug.LogError("Finall: Hit capacity, starting alternative fill method.");
+							loop = true;
+							BattleUnitModel battleUnitModel2 = BattleObjectManager.instance.GetUnitWithIndex(Faction.Enemy, 1);
+							battleUnitModel2.index = 0;
+							index = 1;
+						} else if (loop == false) {
+							index++;
+						} else {
+							battleUnitModel.index = 0;
+						}
+						battleUnitModel.formation = new FormationPosition(battleUnitModel.formation._xmlInfo);
+						// battleUnitModel.formation.ChangePos(new Vector2Int(RandomUtil.Range(1, 25), RandomUtil.Range(-12, 12)));
+						// battleUnitModel.moveDetail.ReturnToFormationByBlink(true);
 					}
-					// We're between phases, so clean up if it won't be done on Round End
-					if (this.phase >= 7)
+					this.PosShuffle();
+					// We're between phases, so clean up if it won't be done on Round End, otherwise do a UI sort (less checks)
+					int i = 0;
+					foreach (BattleUnitModel battleUnitModel in BattleObjectManager.instance.GetList(Faction.Enemy))
 					{
-						this.CleanUp();
+						if (i <= 4) {
+							battleUnitModel.index = i;
+							SingletonBehavior<UICharacterRenderer>.Instance.SetCharacter(battleUnitModel.UnitData.unitData, (i+5), true);
+							i++;
+						} else {
+							battleUnitModel.index = 0;
+							SingletonBehavior<UICharacterRenderer>.Instance.SetCharacter(battleUnitModel.UnitData.unitData, (5), true);
+						}
+						battleUnitModel.moveDetail.ReturnToFormationByBlink(true);
 					}
+					// We refresh the UI after the registrations are all done
+					BattleObjectManager.instance.InitUI();
 				}
 				else
 				{
@@ -523,14 +551,9 @@ namespace FinallyBeyondTheTime
 					// Debug.LogError("Finall: Unregistered Librarian " + battleUnitModel.id);
 				}
 				Debug.LogError("Finall: Setting up floor...");
-				BattleTeamModel battleTeamModel = (BattleTeamModel)typeof(StageController).GetField("_librarianTeam", AccessTools.all).GetValue(Singleton<StageController>.Instance);
-				/* Debug.LogError("Finall: battleTeamModel includes:");
-				foreach (BattleUnitModel battleUnitModel in battleTeamModel.GetList())
-				{
-					Debug.LogError("Finall: battleUnitModel.id: " + battleUnitModel.id);
-				} */
 				if (this.remains.Count > 1)
 				{
+					this.MapChangeStart();
 					Singleton<StageController>.Instance.SetCurrentSephirah(this.remains[0].Sephirah);
 					StageLibraryFloorModel currentStageFloorModel = Singleton<StageController>.Instance.GetCurrentStageFloorModel();
 					// Debug.LogError("Finall: currentStageFloorModel.GetUnitBattleDataList includes:");
@@ -554,6 +577,7 @@ namespace FinallyBeyondTheTime
 					if (!this._angelaappears)
 					{
 						this._angelaappears = true;
+						this.MapChangeStart();
 						Singleton<StageController>.Instance.SetCurrentSephirah(SephirahType.Keter);
 						StageLibraryFloorModel currentStageFloorModel2 = Singleton<StageController>.Instance.GetCurrentStageFloorModel();
 						UnitDataModel unitDataModel = new UnitDataModel(9100501, SephirahType.Keter, true);
@@ -564,8 +588,7 @@ namespace FinallyBeyondTheTime
 						UnitBattleDataModel unitBattleDataModel = new UnitBattleDataModel(Singleton<StageController>.Instance.GetStageModel(), unitDataModel);
 						unitBattleDataModel.Init();
 						battleUnitModel2.SetUnitData(unitBattleDataModel);
-						battleUnitModel2.OnDispose();
-						battleTeamModel.AddUnit(battleUnitModel2);
+						battleUnitModel2.OnCreated();
 						BattleObjectManager.instance.RegisterUnit(battleUnitModel2);
 						battleUnitModel2.passiveDetail.OnUnitCreated();
 						battleUnitModel2.passiveDetail.OnWaveStart();
@@ -620,27 +643,57 @@ namespace FinallyBeyondTheTime
 				}
 			}
 		}
-		private void CleanUp()
+		private void CleanUp(bool psuedo = false)
 		{
 			Debug.LogError("Finall: Cleaning dead enemies...");
-			int i = 5;
+			int i = 0;
+			if (psuedo == true) {
+				Debug.LogError("Finall: Psuedo clean, skipping unregistration");
+			}
 			foreach (BattleUnitModel battleUnitModel in BattleObjectManager.instance.GetList(Faction.Enemy))
 			{
 				if (battleUnitModel.IsDead())
 				{
-					BattleObjectManager.instance.UnregisterUnit(battleUnitModel);
-					// Debug.LogError("Finall: Unregistered Enemy: " + battleUnitModel.id);
+					if (psuedo == false) {
+						BattleObjectManager.instance.UnregisterUnit(battleUnitModel);
+						// Debug.LogError("Finall: Unregistered Enemy: " + battleUnitModel.id);
+					} else {
+						battleUnitModel.index = 4;
+					}
 				} else {
-					// We use this opportunity to reregister living units to lower registers for partial UI functionality, because we might as well
-					// Debug.LogError("Finall: Count Index: " + i);
-					SingletonBehavior<UICharacterRenderer>.Instance.SetCharacter(battleUnitModel.UnitData.unitData, i++, true);
-					// Debug.LogError("Finall: SetCharacter Enemy: " + battleUnitModel.id);
-					// i = ((i+1)%6)+5; // Looped register function, slightly changes display bugs
+					if (i < 4 || psuedo == false && i == 4) {
+						battleUnitModel.index = i;
+						SingletonBehavior<UICharacterRenderer>.Instance.SetCharacter(battleUnitModel.UnitData.unitData, (i+5), true);
+						i++;
+					} else {
+						battleUnitModel.index = 0;
+						SingletonBehavior<UICharacterRenderer>.Instance.SetCharacter(battleUnitModel.UnitData.unitData, (5), true);
+					}
+					// battleUnitModel.formation.ChangePos(new Vector2Int(RandomUtil.Range(1, 25), RandomUtil.Range(-12, 12)));
 				}
 			}
+			this.PosShuffle();
 			// We refresh the UI after the registrations are all done
-			BattleObjectManager.instance.InitUI();
+			Singleton<StageController>.Instance.CheckMapChange();
+			SingletonBehavior<HexagonalMapManager>.Instance.ResetMapSetting();
+			SingletonBehavior<HexagonalMapManager>.Instance.OnRoundStart();
+			SingletonBehavior<BattleCamManager>.Instance.ResetCamSetting();
+			try {
+				BattleObjectManager.instance.InitUI();
+			} catch (IndexOutOfRangeException e) {}
 			Debug.LogError("Finall: Cleaning Finished");
+		}
+		private void MapChangeStart() {
+			// List<MapManager> list = SingletonBehavior<BattleSceneRoot>.Instance.mapList;
+			// MapManager x2 = (list != null) ? list.Find((MapManager x) => x.sephirahType == this.currentFloor) : null;
+			// if (x2 == SingletonBehavior<BattleSceneRoot>.Instance.currentMapObject) {
+			// 		try {
+			// 			MapChangeFilter mapChangeFilter = new MapChangeFilter();
+			// 			mapChangeFilter.StartMapChangingEffect(Direction.RIGHT, true);
+			// 		} catch { Debug.LogError("MapChangeEffectError"); }
+			// }
+			// SingletonBehavior<BattleSceneRoot>.Instance.ChangeToSephirahMap(this.currentFloor, true);
+			Singleton<StageController>.Instance.CheckMapChange();
 		}
 		private void MapChange()
 		{
@@ -652,18 +705,144 @@ namespace FinallyBeyondTheTime
 				this.currentFloor = SephirahType.Keter;
 			}
 			Debug.LogError("Finall: Changing map, new map is " + this.currentFloor);
-			// ChangeToSephirahMap called for transition effect
-			//SingletonBehavior<BattleSceneRoot>.Instance.ChangeToSephirahMap(this.currentFloor, true);
-			// EndBattle only terminates the map structure, not the battle itself. Used to clear the map effectively.
-			SingletonBehavior<BattleSceneRoot>.Instance.EndBattle(true);
-			// Immediately CheckTheme to make the music not temporarily stall.
-			SingletonBehavior<BattleSoundManager>.Instance.CheckTheme();
 			// Emulate map related init functions.
-			Singleton<StageController>.Instance.InitializeMap();
-			Singleton<StageController>.Instance.GetStageModel().GetFloor(this.currentFloor).SetEmotionTeamUnit();
+			SingletonBehavior<BattleSceneRoot>.Instance.HideAllFloorMap();
+			SingletonBehavior<BattleSceneRoot>.Instance.InitFloorMap(this.currentFloor);
 			SingletonBehavior<HexagonalMapManager>.Instance.OnRoundStart();
+			Singleton<StageController>.Instance.GetStageModel().GetFloor(this.currentFloor).SetEmotionTeamUnit();
 			SingletonBehavior<HexagonalMapManager>.Instance.ResetMapSetting();
 			SingletonBehavior<BattleCamManager>.Instance.ResetCamSetting();
+			// SingletonBehavior<BattleSoundManager>.Instance.CheckTheme();
+		}
+		private void PosShuffle()
+		{
+			var unitList = BattleObjectManager.instance.GetAliveList(Faction.Enemy);
+			int maxPoints = unitList.Count;
+			int current = 0;
+			int loopCounter = 0;
+			int maxIterations = 65536 * maxPoints;
+			var minClosestDistance = 16;
+			int[] x = new int[maxPoints];
+			int[] y = new int[maxPoints];
+			while (current < maxPoints && loopCounter < maxIterations) {
+				int xPossible = RandomUtil.Range(1, 25);
+				int yPossible = RandomUtil.Range(-12, 12);
+				if (current == 0) {
+					x[current] = xPossible;
+					y[current] = yPossible;
+					current++;
+					continue;
+				}
+				float[] result1 = new float[current];
+				float[] result2 = new float[current];
+				float[] distances = new float[current];
+				for (int i = 0; i < current; i++) {
+					distances[i] = Mathf.Sqrt(Mathf.Pow(x[i]-xPossible, 2) + Mathf.Pow(y[i] - yPossible, 2));
+				}
+				// Debug.LogError(current+"-min distance: "+distances.Min());
+				if (distances.Min() >= minClosestDistance) {
+					x[current] = xPossible;
+					y[current] = yPossible;
+					current++;
+				}
+				loopCounter++;
+				if (new[] {8192, 16384, 32768}.Contains(loopCounter)) {
+					minClosestDistance = minClosestDistance/2;
+					Debug.LogError(current+": Too many loops, dropping max distance to "+minClosestDistance);
+				}
+			}
+			Debug.LogError("Found "+current+" points in "+loopCounter+" tries");
+			if (current != maxPoints) {
+				Debug.LogError("Filling in "+(maxPoints-current)+" out of "+maxPoints+" entries");
+				while (current < maxPoints) {
+					x[current] = RandomUtil.Range(1, 25);
+					y[current] = RandomUtil.Range(-12, 12);
+					current++;
+				}
+			}
+			current = 0;
+			foreach (BattleUnitModel battleUnitModel in unitList) {
+				var newPos = new Vector2Int(x[current], y[current]);
+				battleUnitModel.formation.ChangePos(newPos);
+				// Debug.LogError(current+": "+newPos);
+				current++;
+			}
+		}
+		private void PassiveReplacer(BattleUnitModel battleUnitModel) {
+			// PassiveAbilityBase[] passives = new PassiveAbilityBase[6];
+			// passives[0] = new PassiveAbility_170101();
+			// passives[1] = new PassiveAbility_170201();
+			// passives[2] = typeof(PassiveAbility_170211);
+			// passives[3] = typeof(PassiveAbility_180001);
+			// passives[4] = typeof(PassiveAbility_180002);
+			// passives[5] = typeof(PassiveAbility_250227);
+
+			try {
+				PassiveAbilityBase oldPassive1 = battleUnitModel.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_170101) as PassiveAbility_170101;
+				if (oldPassive1 != null) {
+					Debug.LogError("Finall: PassiveReplacer: Replacing passive 170101 with Finnal version.");
+					battleUnitModel.passiveDetail.DestroyPassive(oldPassive1);
+					battleUnitModel.passiveDetail.AddPassive(new PassiveAbility_170101_Finnal());
+				}
+			}
+			catch (ArgumentNullException e) {
+				// Debug.LogError("Finall: PassiveReplacer: Passive 170101 not found.");
+			}
+			try {
+				PassiveAbilityBase oldPassive2 = battleUnitModel.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_170201);
+				if (oldPassive2 != null) {
+					Debug.LogError("Finall: PassiveReplacer: Replacing passive 170201 with Finnal version.");
+					battleUnitModel.passiveDetail.DestroyPassive(oldPassive2);
+					battleUnitModel.passiveDetail.AddPassive(new PassiveAbility_170201_Finnal());
+				}
+			}
+			catch (ArgumentNullException e) {
+				// Debug.LogError("Finall: PassiveReplacer: Passive 170201 not found.");
+			}
+			try {
+				PassiveAbilityBase oldPassive3 = battleUnitModel.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_170211);
+				if (oldPassive3 != null) {
+					Debug.LogError("Finall: PassiveReplacer: Replacing passive 170211 with Finnal version.");
+					battleUnitModel.passiveDetail.DestroyPassive(oldPassive3);
+					battleUnitModel.passiveDetail.AddPassive(new PassiveAbility_170211_Finnal());
+				}
+			}
+			catch (ArgumentNullException e) {
+				// Debug.LogError("Finall: PassiveReplacer: Passive 170211 not found.");
+			}
+			try {
+				PassiveAbilityBase oldPassive4 = battleUnitModel.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_180001);
+				if (oldPassive4 != null) {
+					Debug.LogError("Finall: PassiveReplacer: Replacing passive 180001 with Finnal version.");
+					battleUnitModel.passiveDetail.DestroyPassive(oldPassive4);
+					battleUnitModel.passiveDetail.AddPassive(new PassiveAbility_180001_Finnal());
+				}
+			}
+			catch (ArgumentNullException e) {
+				// Debug.LogError("Finall: PassiveReplacer: Passive 180001 not found.");
+			}
+			try {
+				PassiveAbilityBase oldPassive5 = battleUnitModel.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_180002);
+				if (oldPassive5 != null) {
+					Debug.LogError("Finall: PassiveReplacer: Replacing passive 180002 with Finnal version.");
+					battleUnitModel.passiveDetail.DestroyPassive(oldPassive5);
+					battleUnitModel.passiveDetail.AddPassive(new PassiveAbility_180002_Finnal());
+				}
+			}
+			catch (ArgumentNullException e) {
+				// Debug.LogError("Finall: PassiveReplacer: Passive 180002 not found.");
+			}
+			try {
+				PassiveAbilityBase oldPassive6 = battleUnitModel.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_250227);
+				if (oldPassive6 != null) {
+					Debug.LogError("Finall: PassiveReplacer: Replacing passive 250227 with Finnal version.");
+					battleUnitModel.passiveDetail.DestroyPassive(oldPassive6);
+					battleUnitModel.passiveDetail.AddPassive(new PassiveAbility_250227_Finnal());
+				}
+			}
+			catch (ArgumentNullException e) {
+				// Debug.LogError("Finall: PassiveReplacer: Passive 250227 not found.");
+			}
 		}
 
 		private BattleUnitModel pt = new BattleUnitModel(50035);
@@ -671,10 +850,13 @@ namespace FinallyBeyondTheTime
 		private int phase;
 		private SephirahType currentFloor;
 
-		private bool _finished;
+		private bool _finished = false;
 
 		private bool _angelaappears;
 
 		private List<StageLibraryFloorModel> remains = new List<StageLibraryFloorModel>();
+
+		// [SerializeField]
+		// private MapChangeFilter _mapChangeFilter;
 	}
 }
