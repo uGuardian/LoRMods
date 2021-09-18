@@ -52,7 +52,7 @@ namespace ArbiterFragment
 		}
         public override void OnRoundEndTheLast()
         {
-            if (this.owner.emotionDetail.EmotionLevel >= fragmentEmoLevel && fragmentActivated < 2)
+            if (fragmentActivated < 2 && this.owner.emotionDetail.EmotionLevel >= fragmentEmoLevel)
             {
                 // Debug.LogError("ArbiterFragment: Buffing Binah");
                 PassiveAbilityBase oldPassive = this.owner.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_10011);
@@ -133,7 +133,7 @@ namespace ArbiterFragment
         }
         public override int GetMaxHpBonus()
         {
-            if (fragmentActivated > 0)
+            if (fragmentActivated > 0 || this.owner.emotionDetail.EmotionLevel >= fragmentEmoLevel)
             {
                 return fragmentHP;
             } else {
@@ -142,7 +142,7 @@ namespace ArbiterFragment
         }
         public override int GetMaxBpBonus()
         {
-            if (fragmentActivated > 0)
+            if (fragmentActivated > 0 || this.owner.emotionDetail.EmotionLevel >= fragmentEmoLevel)
             {
                 return fragmentBP;
             } else {
