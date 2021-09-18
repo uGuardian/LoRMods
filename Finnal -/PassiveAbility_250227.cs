@@ -42,8 +42,7 @@ namespace FinallyBeyondTheTime
 
 		public override void OnRoundStart()
 		{
-			// if (!(this.owner.UnitData.floorBattleData.param2 > 0))
-			if (false)
+			if (!(this.owner.UnitData.floorBattleData.param2 > 0))
 			{
 				if (this._teleportReady || this.owner.hp <= (float)this._teleportCondition)
 				{
@@ -51,7 +50,8 @@ namespace FinallyBeyondTheTime
 					this.owner.breakDetail.nextTurnBreak = false;
 					this.owner.breakDetail.RecoverBreak(this.owner.breakDetail.GetDefaultBreakGauge());
 					this.owner.UnitData.floorBattleData.param2 = 1;
-					if (Singleton<StageController>.Instance.GetStageModel().ClassInfo.id != 600013)
+					// if (Singleton<StageController>.Instance.GetStageModel().ClassInfo.id != 600013)
+					if (false)
 					{
 						List<StageLibraryFloorModel> availableFloorList = Singleton<StageController>.Instance.GetStageModel().GetAvailableFloorList();
 						availableFloorList.RemoveAll((StageLibraryFloorModel x) => x.Sephirah == SephirahType.Chesed);
