@@ -92,7 +92,8 @@ namespace FinallyBeyondTheTime
 			}
 			else
 			{
-				if (!(Singleton<StageController>.Instance.GetStageModel().ClassInfo.id != 600013 || (!this._teleportReady && this.owner.hp > (float)this._teleportCondition)))
+				// if (!(Singleton<StageController>.Instance.GetStageModel().ClassInfo.id != 600013 || (!this._teleportReady && this.owner.hp > (float)this._teleportCondition)))
+				if (!(false || (!this._teleportReady && this.owner.hp > (float)this._teleportCondition)))
 				{
 					if (this._elapsedTimeTeleport < Mathf.Epsilon)
 					{

@@ -28,7 +28,8 @@ namespace FinallyBeyondTheTime
 		{
 			get
 			{
-				return this._stageManager == null || this._stageManager.CurrentPhase != EnemyTeamStageManager_FinalFinal.FinalPhase.RolandOnly || Singleton<StageController>.Instance.GetStageModel().ClassInfo.id == 600013;
+				// return this._stageManager == null || this._stageManager.CurrentPhase != EnemyTeamStageManager_FinalFinal.FinalPhase.RolandOnly || Singleton<StageController>.Instance.GetStageModel().ClassInfo.id == 600013;
+				return true;
 			}
 		}
 
@@ -44,7 +45,8 @@ namespace FinallyBeyondTheTime
 
 		public override void OnWaveStart()
 		{
-			if (Singleton<StageController>.Instance.GetStageModel().ClassInfo.id != 600013)
+			// if (Singleton<StageController>.Instance.GetStageModel().ClassInfo.id != 600013)
+			if (false)
 			{
 				this._stageManager = (Singleton<StageController>.Instance.EnemyStageManager as EnemyTeamStageManager_FinalFinal);
 			}
@@ -81,7 +83,8 @@ namespace FinallyBeyondTheTime
 
 		public override void OnRoundStartAfter()
 		{
-			if (Singleton<StageController>.Instance.GetStageModel().ClassInfo.id != 600013)
+			// if (Singleton<StageController>.Instance.GetStageModel().ClassInfo.id != 600013)
+			if (false)
 			{
 				this.ResetPriorityAdder();
 				if (this._stageManager != null)
@@ -164,7 +167,8 @@ namespace FinallyBeyondTheTime
 
 		public override BattleUnitModel ChangeAttackTarget(BattleDiceCardModel card, int idx)
 		{
-			if (Singleton<StageController>.Instance.GetStageModel().ClassInfo.id != 600013)
+			// if (Singleton<StageController>.Instance.GetStageModel().ClassInfo.id != 600013)
+			if (false)
 			{
 				if (this._stageManager != null && this._stageManager.GetBinahUnit() == null)
 				{
