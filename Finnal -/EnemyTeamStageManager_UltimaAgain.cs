@@ -25,7 +25,7 @@ namespace FinallyBeyondTheTime
 			config = File.ReadAllLines(configFile);
 			try {
 				bool settingResult = System.Convert.ToBoolean(config[Array.IndexOf(config, settingKey)+1]);
-				Debug.LogError("Finall: " + settingKey + " = " + settingResult);
+				Debug.Log("Finall: " + settingKey + " = " + settingResult);
 				return settingResult;
 			} catch (Exception ex) {
 				Debug.LogError(ex.Message + Environment.NewLine + ex.StackTrace);
@@ -37,7 +37,7 @@ namespace FinallyBeyondTheTime
 		{
 			this.phase = 0;
 			this.currentFloor = Singleton<StageController>.Instance.GetCurrentStageFloorModel().Sephirah;
-			Debug.LogError("Finall: Initial floor is " + this.currentFloor);
+			Debug.Log("Finall: Initial floor is " + this.currentFloor);
 			FinallConfig("diceSpeedUp"); // Outputs the current setting into the log, does nothing else
 			this._angelaappears = false;
 			this.remains.Clear();
@@ -51,13 +51,13 @@ namespace FinallyBeyondTheTime
 					{
 						this.remains.Add(stageLibraryFloorModel);
 					} else {
-						Debug.LogError("Finall: Floor list skipping over " + this.currentFloor);
+						Debug.Log("Finall: Floor list skipping over " + this.currentFloor);
 					}
 				}
 			}
 			if (this.currentFloor != SephirahType.Keter)
 			{
-				Debug.LogError("Finall: Inserting Keter at top of floor list");
+				Debug.Log("Finall: Inserting Keter at top of floor list");
 				this.remains.Insert(0, this.remains[this.remains.Count - 1]);
 			}
 			// finnalFormation = new FormationModel(Singleton<StageController>.Instance.GetCurrentWaveModel().GetFormation().XmlInfo);
@@ -96,10 +96,6 @@ namespace FinallyBeyondTheTime
 					}
 					break;
 				}
-				// Debug.LogError(SingletonBehavior<HexagonalMapManager>.Instance.CellToWorldPos(battleUnitModel.formationCellPos + SingletonBehavior<HexagonalMapManager>.Instance.CenterCell));
-				// Debug.LogError(battleUnitModel.formationCellPos);
-				// Debug.LogError(SingletonBehavior<HexagonalMapManager>.Instance.CenterCell);
-				// battleUnitModel.view.WorldPosition = new Vector3Int(RandomUtil.Range(-48, 0), 0, RandomUtil.Range(-30, 12));
 			}
 		}
 
@@ -460,7 +456,7 @@ namespace FinallyBeyondTheTime
 					this.CleanUp();
 				}
 				this.phase++;
-				Debug.LogError("Finall: Starting Phase Transition, new phase is " + this.phase);
+				Debug.Log("Finall: Starting Phase Transition, new phase is " + this.phase);
 				if (this.phase <= 12)
 				{
 					foreach (BattleUnitModel battleUnitModel in BattleObjectManager.instance.GetAliveList(Faction.Player))
@@ -488,7 +484,7 @@ namespace FinallyBeyondTheTime
 							this.pt = battleUnitModel;
 						}
 						if (index == 4 && loop == false) {
-							Debug.LogError("Finall: Hit capacity, starting alternative fill method.");
+							Debug.Log("Finall: Hit capacity, starting alternative fill method.");
 							loop = true;
 							BattleUnitModel battleUnitModel2 = BattleObjectManager.instance.GetUnitWithIndex(Faction.Enemy, 1);
 							battleUnitModel2.index = 0;
@@ -543,14 +539,14 @@ namespace FinallyBeyondTheTime
 		{
 			if (BattleObjectManager.instance.GetAliveList(Faction.Player).Count <= 0)
 			{
-				Debug.LogError("Finall: Starting Floor Transition, changing from " + this.currentFloor + " to " + this.remains[0].Sephirah);
-				Debug.LogError("Finall: Cleaning current floor...");
+				Debug.Log("Finall: Starting Floor Transition, changing from " + this.currentFloor + " to " + this.remains[0].Sephirah);
+				Debug.Log("Finall: Cleaning current floor...");
 				foreach (BattleUnitModel battleUnitModel in BattleObjectManager.instance.GetList(Faction.Player))
 				{
 					BattleObjectManager.instance.UnregisterUnit(battleUnitModel);
 					// Debug.LogError("Finall: Unregistered Librarian " + battleUnitModel.id);
 				}
-				Debug.LogError("Finall: Setting up floor...");
+				Debug.Log("Finall: Setting up floor...");
 				if (this.remains.Count > 1)
 				{
 					this.MapChangeStart();
@@ -601,7 +597,7 @@ namespace FinallyBeyondTheTime
 				}
 				// Refresh UI after floor setup is complete
 				BattleObjectManager.instance.InitUI();
-				Debug.LogError("Finall: Floor Setup Complete");
+				Debug.Log("Finall: Floor Setup Complete");
 			}
 			bool angelaappears = this._angelaappears;
 			if (angelaappears)
@@ -645,10 +641,10 @@ namespace FinallyBeyondTheTime
 		}
 		private void CleanUp(bool psuedo = false)
 		{
-			Debug.LogError("Finall: Cleaning dead enemies...");
+			Debug.Log("Finall: Cleaning dead enemies...");
 			int i = 0;
 			if (psuedo == true) {
-				Debug.LogError("Finall: Psuedo clean, skipping unregistration");
+				Debug.Log("Finall: Psuedo clean, skipping unregistration");
 			}
 			foreach (BattleUnitModel battleUnitModel in BattleObjectManager.instance.GetList(Faction.Enemy))
 			{
@@ -674,6 +670,8 @@ namespace FinallyBeyondTheTime
 			}
 			this.PosShuffle();
 			// We refresh the UI after the registrations are all done
+			int emotionTotalCoinNumber = Singleton<StageController>.Instance.GetCurrentWaveModel().team.emotionTotalCoinNumberWithBonus;
+			Singleton<StageController>.Instance.GetCurrentStageFloorModel().team.emotionTotalBonus = emotionTotalCoinNumber;
 			Singleton<StageController>.Instance.CheckMapChange();
 			SingletonBehavior<HexagonalMapManager>.Instance.ResetMapSetting();
 			SingletonBehavior<HexagonalMapManager>.Instance.OnRoundStart();
@@ -681,7 +679,7 @@ namespace FinallyBeyondTheTime
 			try {
 				BattleObjectManager.instance.InitUI();
 			} catch (IndexOutOfRangeException e) {}
-			Debug.LogError("Finall: Cleaning Finished");
+			Debug.Log("Finall: Cleaning Finished");
 		}
 		private void MapChangeStart() {
 			// List<MapManager> list = SingletonBehavior<BattleSceneRoot>.Instance.mapList;
@@ -693,6 +691,8 @@ namespace FinallyBeyondTheTime
 			// 		} catch { Debug.LogError("MapChangeEffectError"); }
 			// }
 			// SingletonBehavior<BattleSceneRoot>.Instance.ChangeToSephirahMap(this.currentFloor, true);
+			int emotionTotalCoinNumber = Singleton<StageController>.Instance.GetCurrentWaveModel().team.emotionTotalCoinNumberWithBonus;
+			Singleton<StageController>.Instance.GetCurrentStageFloorModel().team.emotionTotalBonus = emotionTotalCoinNumber;
 			Singleton<StageController>.Instance.CheckMapChange();
 		}
 		private void MapChange()
@@ -704,7 +704,7 @@ namespace FinallyBeyondTheTime
 			} else {
 				this.currentFloor = SephirahType.Keter;
 			}
-			Debug.LogError("Finall: Changing map, new map is " + this.currentFloor);
+			Debug.Log("Finall: Changing map, new map is " + this.currentFloor);
 			// Emulate map related init functions.
 			SingletonBehavior<BattleSceneRoot>.Instance.HideAllFloorMap();
 			SingletonBehavior<BattleSceneRoot>.Instance.InitFloorMap(this.currentFloor);
@@ -748,12 +748,12 @@ namespace FinallyBeyondTheTime
 				loopCounter++;
 				if (new[] {8192, 16384, 32768}.Contains(loopCounter)) {
 					minClosestDistance = minClosestDistance/2;
-					Debug.LogError(current+": Too many loops, dropping max distance to "+minClosestDistance);
+					Debug.Log("Finall: PosShuffle: "+current+": Too many loops, dropping max distance to "+minClosestDistance);
 				}
 			}
-			Debug.LogError("Found "+current+" points in "+loopCounter+" tries");
+			Debug.Log("Finall: PosShuffle: Found "+current+" points in "+loopCounter+" tries");
 			if (current != maxPoints) {
-				Debug.LogError("Filling in "+(maxPoints-current)+" out of "+maxPoints+" entries");
+				Debug.Log("Finall: PosShuffle: Filling in "+(maxPoints-current)+" out of "+maxPoints+" entries");
 				while (current < maxPoints) {
 					x[current] = RandomUtil.Range(1, 25);
 					y[current] = RandomUtil.Range(-12, 12);
@@ -780,7 +780,7 @@ namespace FinallyBeyondTheTime
 			try {
 				PassiveAbilityBase oldPassive1 = battleUnitModel.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_170101) as PassiveAbility_170101;
 				if (oldPassive1 != null) {
-					Debug.LogError("Finall: PassiveReplacer: Replacing passive 170101 with Finnal version.");
+					Debug.Log("Finall: PassiveReplacer: Replacing passive 170101 with Finnal version.");
 					battleUnitModel.passiveDetail.DestroyPassive(oldPassive1);
 					battleUnitModel.passiveDetail.AddPassive(new PassiveAbility_170101_Finnal());
 				}
@@ -791,7 +791,7 @@ namespace FinallyBeyondTheTime
 			try {
 				PassiveAbilityBase oldPassive2 = battleUnitModel.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_170201);
 				if (oldPassive2 != null) {
-					Debug.LogError("Finall: PassiveReplacer: Replacing passive 170201 with Finnal version.");
+					Debug.Log("Finall: PassiveReplacer: Replacing passive 170201 with Finnal version.");
 					battleUnitModel.passiveDetail.DestroyPassive(oldPassive2);
 					battleUnitModel.passiveDetail.AddPassive(new PassiveAbility_170201_Finnal());
 				}
@@ -802,7 +802,7 @@ namespace FinallyBeyondTheTime
 			try {
 				PassiveAbilityBase oldPassive3 = battleUnitModel.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_170211);
 				if (oldPassive3 != null) {
-					Debug.LogError("Finall: PassiveReplacer: Replacing passive 170211 with Finnal version.");
+					Debug.Log("Finall: PassiveReplacer: Replacing passive 170211 with Finnal version.");
 					battleUnitModel.passiveDetail.DestroyPassive(oldPassive3);
 					battleUnitModel.passiveDetail.AddPassive(new PassiveAbility_170211_Finnal());
 				}
@@ -813,7 +813,7 @@ namespace FinallyBeyondTheTime
 			try {
 				PassiveAbilityBase oldPassive4 = battleUnitModel.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_180001);
 				if (oldPassive4 != null) {
-					Debug.LogError("Finall: PassiveReplacer: Replacing passive 180001 with Finnal version.");
+					Debug.Log("Finall: PassiveReplacer: Replacing passive 180001 with Finnal version.");
 					battleUnitModel.passiveDetail.DestroyPassive(oldPassive4);
 					battleUnitModel.passiveDetail.AddPassive(new PassiveAbility_180001_Finnal());
 				}
@@ -824,7 +824,7 @@ namespace FinallyBeyondTheTime
 			try {
 				PassiveAbilityBase oldPassive5 = battleUnitModel.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_180002);
 				if (oldPassive5 != null) {
-					Debug.LogError("Finall: PassiveReplacer: Replacing passive 180002 with Finnal version.");
+					Debug.Log("Finall: PassiveReplacer: Replacing passive 180002 with Finnal version.");
 					battleUnitModel.passiveDetail.DestroyPassive(oldPassive5);
 					battleUnitModel.passiveDetail.AddPassive(new PassiveAbility_180002_Finnal());
 				}
@@ -835,13 +835,23 @@ namespace FinallyBeyondTheTime
 			try {
 				PassiveAbilityBase oldPassive6 = battleUnitModel.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_250227);
 				if (oldPassive6 != null) {
-					Debug.LogError("Finall: PassiveReplacer: Replacing passive 250227 with Finnal version.");
+					Debug.Log("Finall: PassiveReplacer: Replacing passive 250227 with Finnal version.");
 					battleUnitModel.passiveDetail.DestroyPassive(oldPassive6);
 					battleUnitModel.passiveDetail.AddPassive(new PassiveAbility_250227_Finnal());
 				}
 			}
 			catch (ArgumentNullException e) {
 				// Debug.LogError("Finall: PassiveReplacer: Passive 250227 not found.");
+			}
+			try {
+				PassiveAbilityBase oldPassive7 = battleUnitModel.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_1410014);
+				if (oldPassive7 != null) {
+					Debug.Log("Finall: PassiveReplacer: Removing passive 1410014.");
+					battleUnitModel.passiveDetail.DestroyPassive(oldPassive7);
+				}
+			}
+			catch (ArgumentNullException e) {
+				// Debug.LogError("Finall: PassiveReplacer: Passive 1410014 not found.");
 			}
 		}
 
