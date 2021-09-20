@@ -54,7 +54,7 @@ namespace ArbiterFragment
         {
             if (fragmentActivated < 2 && this.owner.emotionDetail.EmotionLevel >= fragmentEmoLevel)
             {
-                // Debug.LogError("ArbiterFragment: Buffing Binah");
+                Debug.Log("ArbiterFragment: Buffing Binah");
                 PassiveAbilityBase oldPassive = this.owner.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_10011);
                 this.owner.passiveDetail.DestroyPassive(oldPassive);
                 this.owner.passiveDetail.AddPassive(new PassiveAbility_180005());
@@ -176,7 +176,7 @@ namespace ArbiterFragment
                 // Debug.LogError("FragmentConfigIndex: " + config[Array.IndexOf(config, settingKey)]);
                 // Debug.LogError("FragmentConfigIndex: " + config[Array.IndexOf(config, settingKey)+1]);
 				int settingResult = System.Convert.ToInt32(config[Array.IndexOf(config, settingKey)+1]);
-				Debug.LogError("ArbiterFragment: " + settingKey + " = " + settingResult);
+				Debug.Log("ArbiterFragment: " + settingKey + " = " + settingResult);
 				return settingResult;
 			} catch (Exception ex) {
 				Debug.LogError(ex.Message + Environment.NewLine + ex.StackTrace);
@@ -192,7 +192,7 @@ namespace ArbiterFragment
                     throw new ArgumentException("Config Returned Null");
                 }
                 bool settingResult = System.Convert.ToBoolean(config);
-                Debug.LogError("ArbiterFragment: " + settingKey + "(bool) = " + settingResult);
+                Debug.Log("ArbiterFragment: " + settingKey + "(bool) = " + settingResult);
                 return System.Convert.ToBoolean(settingResult);
             } catch {
 				Debug.LogError("ArbiterFragment: Error occured in boolean conversion for variable " + settingKey + "(bool), Assuming default");
