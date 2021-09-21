@@ -20,7 +20,8 @@ namespace FinallyBeyondTheTime
 				{
 					this.owner.allyCardDetail.ExhaustAllCards();
 					int num = -1;
-					if (Singleton<StageController>.Instance.GetStageModel().ClassInfo.id != 600013)
+					// if (Singleton<StageController>.Instance.GetStageModel().ClassInfo.id != 600013)
+					if (false)
 					{
 						EnemyTeamStageManager enemyStageManager = Singleton<StageController>.Instance.EnemyStageManager;
 						if (enemyStageManager is EnemyTeamStageManager_BlackSilence)

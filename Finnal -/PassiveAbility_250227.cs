@@ -8,16 +8,16 @@ namespace FinallyBeyondTheTime
 	{
 		public override int SpeedDiceNumAdder()
 		{
-			int result;
 			if (this._patternCount <= 3)
 			{
-				result = 2;
+				return 2;
 			}
-			else
-			{
-				result = 3;
-			}
-			return result;
+			return 3;
+		}
+
+		private int GetCurrentSpeedDiceNum()
+		{
+			return this.owner.Book.GetSpeedDiceRule(this.owner).Roll(this.owner).Count;
 		}
 
 		public override void OnWaveStart()
@@ -92,7 +92,8 @@ namespace FinallyBeyondTheTime
 			}
 			else
 			{
-				if (!(Singleton<StageController>.Instance.GetStageModel().ClassInfo.id != 600013 || (!this._teleportReady && this.owner.hp > (float)this._teleportCondition)))
+				// if (!(Singleton<StageController>.Instance.GetStageModel().ClassInfo.id != 600013 || (!this._teleportReady && this.owner.hp > (float)this._teleportCondition)))
+				if (!(false || (!this._teleportReady && this.owner.hp > (float)this._teleportCondition)))
 				{
 					if (this._elapsedTimeTeleport < Mathf.Epsilon)
 					{
@@ -206,10 +207,7 @@ namespace FinallyBeyondTheTime
 			{
 				this._alreayUsed.Clear();
 			}
-			int param = 0;
-			try {
-				param = this.owner.UnitData.floorBattleData.param2;
-			} catch { Debug.LogError("Finall: PurpleTear failed to find param2"); }
+			int param = this.owner.UnitData.floorBattleData.param2;
 			if (param > 0 && !this._alreayUsed.Contains(PurpleStance.Defense))
 			{
 				this._alreayUsed.Add(PurpleStance.Defense);
@@ -228,7 +226,6 @@ namespace FinallyBeyondTheTime
 			switch (RandomUtil.SelectOne<PurpleStance>(list))
 			{
 			case PurpleStance.Slash:
-			{
 				this._stancePassive.ChangeStance_slash();
 				this.owner.bufListDetail.AddKeywordBufThisRoundByEtc(KeywordBuf.SlashPowerUp, 1, null);
 				if (param > 0)
@@ -240,10 +237,8 @@ namespace FinallyBeyondTheTime
 					this._stanceCooltime = 2;
 				}
 				this._alreayUsed.Add(PurpleStance.Slash);
-				break;
-			}
+				return;
 			case PurpleStance.Penetrate:
-			{
 				this._stancePassive.ChangeStance_penetrate();
 				this.owner.bufListDetail.AddKeywordBufThisRoundByEtc(KeywordBuf.PenetratePowerUp, 1, null);
 				if (param > 0)
@@ -255,10 +250,8 @@ namespace FinallyBeyondTheTime
 					this._stanceCooltime = 2;
 				}
 				this._alreayUsed.Add(PurpleStance.Penetrate);
-				break;
-			}
+				return;
 			case PurpleStance.Hit:
-			{
 				this._stancePassive.ChangeStance_hit();
 				this.owner.bufListDetail.AddKeywordBufThisRoundByEtc(KeywordBuf.HitPowerUp, 1, null);
 				if (param > 0)
@@ -270,30 +263,26 @@ namespace FinallyBeyondTheTime
 					this._stanceCooltime = 2;
 				}
 				this._alreayUsed.Add(PurpleStance.Hit);
-				break;
-			}
+				return;
 			case PurpleStance.Defense:
 				this._stancePassive.ChangeStance_defense();
 				this.owner.bufListDetail.AddKeywordBufThisRoundByEtc(KeywordBuf.DefensePowerUp, 1, null);
 				this._stanceCooltime = 1;
 				this._alreayUsed.Add(PurpleStance.Defense);
-				break;
+				return;
+			default:
+				return;
 			}
 		}
 
 		private int AddNewCard(int id)
 		{
-			BattleDiceCardModel battleDiceCardModel = this.owner.allyCardDetail.AddNewCard(id, false);
-			int result;
+			BattleDiceCardModel battleDiceCardModel = this.owner.allyCardDetail.AddTempCard(id);
 			if (battleDiceCardModel != null)
 			{
-				result = battleDiceCardModel.GetOriginCost();
+				return battleDiceCardModel.GetOriginCost();
 			}
-			else
-			{
-				result = 1;
-			}
-			return result;
+			return 1;
 		}
 
 		public override bool BeforeTakeDamage(BattleUnitModel attacker, int dmg)
