@@ -31,7 +31,7 @@ namespace FinallyBeyondTheTime {
 			if (Singleton<StageController>.Instance.EnemyStageManager is EnemyTeamStageManager_UltimaAgain) {
     			return null;
 			} else {
-				throw __exception;
+				return __exception;
 			}
     	}
 		[HarmonyFinalizer]
@@ -40,7 +40,7 @@ namespace FinallyBeyondTheTime {
 			if (Singleton<StageController>.Instance.EnemyStageManager is EnemyTeamStageManager_UltimaAgain) {
     			return null;
 			} else {
-				throw __exception;
+				return __exception;
 			}
     	}
 		[HarmonyFinalizer]
@@ -49,7 +49,7 @@ namespace FinallyBeyondTheTime {
 			if (Singleton<StageController>.Instance.EnemyStageManager is EnemyTeamStageManager_UltimaAgain) {
     			return null;
 			} else {
-				throw __exception;
+				return __exception;
 			}
     	}
     }
