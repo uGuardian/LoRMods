@@ -149,6 +149,8 @@ namespace ArbiterFragment
                 return 0;
             }
         }
+        
+        [Obsolete("Use FragmentConfig class (ConfigAPI) instead", true)]
         public static int? ArbiterFragmentConfig(string settingKey)
 		{
 			string configFile = SaveManager.GetFullPath("Arbiter_Fragment.ini");
@@ -184,6 +186,7 @@ namespace ArbiterFragment
 				return null;
 			}
 		}
+        [Obsolete("Use FragmentConfig class (ConfigAPI) instead", true)]
         private static bool? ArbiterFragmentConfigBool(string settingKey)
         {
             try {
@@ -200,11 +203,27 @@ namespace ArbiterFragment
             }
         }
 
-        private static int fragmentEmoLevel = ArbiterFragmentConfig("FragmentEmoLevel") ?? 3;
-        private static int fragmentHP = ArbiterFragmentConfig("FragmentBonusHP") ?? 15;
-        private static int fragmentBP = ArbiterFragmentConfig("FragmentBonusStagger") ?? 15;
-        private static bool fragmentActivationHP = ArbiterFragmentConfigBool("FragmentActivationHP") ?? true;
-        private static bool fragmentActivationBP = ArbiterFragmentConfigBool("FragmentActivationStagger") ?? true;
+        // Old variables directly reference new config interface
+        private static int fragmentEmoLevel {
+            get {return FragmentConfig.Instance.FragmentEmoLevel;}
+            set {FragmentConfig.Instance.FragmentEmoLevel = value;}
+        }
+        private static int fragmentHP {
+            get {return FragmentConfig.Instance.FragmentBonusHP;}
+            set {FragmentConfig.Instance.FragmentBonusHP = value;}
+        }
+        private static int fragmentBP {
+            get {return FragmentConfig.Instance.FragmentBonusStagger;}
+            set {FragmentConfig.Instance.FragmentBonusStagger = value;}
+        }
+        private static bool fragmentActivationHP {
+            get {return FragmentConfig.Instance.FragmentActivationHP;}
+            set {FragmentConfig.Instance.FragmentActivationHP = value;}
+        }
+        private static bool fragmentActivationBP {
+            get {return FragmentConfig.Instance.FragmentActivationStagger;}
+            set {FragmentConfig.Instance.FragmentActivationStagger = value;}
+        }
         private static byte fragmentActivated = 0;
         private bool fragmentStartBP = false;
     }
