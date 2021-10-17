@@ -7,6 +7,9 @@
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\libs\BepInEx\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib">
       <HintPath>..\libs\Managed\mscorlib.dll</HintPath>
     </Reference>
@@ -115,17 +118,16 @@
     <Reference Include="XGamingRuntime">
       <HintPath>..\libs\Managed\XGamingRuntime.dll</HintPath>
     </Reference>
-    <Content Include="StaticInfo\PassiveList\PassiveList.txt" />
-    <Content Include="StaticInfo\DropBook\DropBook.txt" />
-    <Content Include="StaticInfo\EquipPage\EquipPage.txt" />
-    <Content Include="StaticInfo\StageInfo\StageInfo.txt" />
-    <Content Include="Localize\en\_PassiveDesc.txt" />
-    <Content Include="Localize\en\PassiveDesc\_PassiveDesc.txt" />
-    <Content Include="Localize\en\Books\_Books.txt" />
-    <Content Include="StaticInfo\EnemyUnitInfo\EnemyUnitInfo.txt" />
-    <Content Include="Localize\en\etc\EN_Dropbook.txt" />
-    <Content Include="PassiveAbilities.cs" />
-    <ProjectReference Include="..\ConfigAPI\ConfigAPI.csproj" />
-    <Content Include="FragmentConfig.cs" />
+    <Content Include="ConfigAPI.cs" />
+    <Content Include="Initializer.cs" />
+    <Compile Remove="Template.cs" />
+    <Content Include="ConfigMenu.cs" />
+    <Content Include="UtilTools.cs" />
+    <Content Include="ConfigMenu\ModButton.cs" />
+    <Content Include="ConfigMenu\UtilTools.cs" />
+    <Content Include="ConfigMenu\ModList.cs" />
+    <Content Include="ConfigMenu\ModInfo.cs" />
+    <Content Include="ConfigMenu\ModSlot.cs" />
+    <Content Include="ConfigMenu\ModDesc.cs" />
   </ItemGroup>
 </Project>

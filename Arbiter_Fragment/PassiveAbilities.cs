@@ -54,7 +54,7 @@ namespace ArbiterFragment
         {
             if (fragmentActivated < 2 && this.owner.emotionDetail.EmotionLevel >= fragmentEmoLevel)
             {
-                // Debug.LogError("ArbiterFragment: Buffing Binah");
+                Debug.Log("ArbiterFragment: Buffing Binah");
                 PassiveAbilityBase oldPassive = this.owner.passiveDetail.PassiveList.Find((PassiveAbilityBase x) => x is PassiveAbility_10011);
                 this.owner.passiveDetail.DestroyPassive(oldPassive);
                 this.owner.passiveDetail.AddPassive(new PassiveAbility_180005());
@@ -149,6 +149,8 @@ namespace ArbiterFragment
                 return 0;
             }
         }
+        
+        [Obsolete("Use FragmentConfig class (ConfigAPI) instead", true)]
         public static int? ArbiterFragmentConfig(string settingKey)
 		{
 			string configFile = SaveManager.GetFullPath("Arbiter_Fragment.ini");
@@ -176,7 +178,7 @@ namespace ArbiterFragment
                 // Debug.LogError("FragmentConfigIndex: " + config[Array.IndexOf(config, settingKey)]);
                 // Debug.LogError("FragmentConfigIndex: " + config[Array.IndexOf(config, settingKey)+1]);
 				int settingResult = System.Convert.ToInt32(config[Array.IndexOf(config, settingKey)+1]);
-				Debug.LogError("ArbiterFragment: " + settingKey + " = " + settingResult);
+				Debug.Log("ArbiterFragment: " + settingKey + " = " + settingResult);
 				return settingResult;
 			} catch (Exception ex) {
 				Debug.LogError(ex.Message + Environment.NewLine + ex.StackTrace);
@@ -184,6 +186,7 @@ namespace ArbiterFragment
 				return null;
 			}
 		}
+        [Obsolete("Use FragmentConfig class (ConfigAPI) instead", true)]
         private static bool? ArbiterFragmentConfigBool(string settingKey)
         {
             try {
@@ -192,7 +195,7 @@ namespace ArbiterFragment
                     throw new ArgumentException("Config Returned Null");
                 }
                 bool settingResult = System.Convert.ToBoolean(config);
-                Debug.LogError("ArbiterFragment: " + settingKey + "(bool) = " + settingResult);
+                Debug.Log("ArbiterFragment: " + settingKey + "(bool) = " + settingResult);
                 return System.Convert.ToBoolean(settingResult);
             } catch {
 				Debug.LogError("ArbiterFragment: Error occured in boolean conversion for variable " + settingKey + "(bool), Assuming default");
@@ -200,11 +203,27 @@ namespace ArbiterFragment
             }
         }
 
-        private static int fragmentEmoLevel = ArbiterFragmentConfig("FragmentEmoLevel") ?? 3;
-        private static int fragmentHP = ArbiterFragmentConfig("FragmentBonusHP") ?? 15;
-        private static int fragmentBP = ArbiterFragmentConfig("FragmentBonusStagger") ?? 15;
-        private static bool fragmentActivationHP = ArbiterFragmentConfigBool("FragmentActivationHP") ?? true;
-        private static bool fragmentActivationBP = ArbiterFragmentConfigBool("FragmentActivationStagger") ?? true;
+        // Old variables directly reference new config interface
+        private static int fragmentEmoLevel {
+            get {return FragmentConfig.Instance.FragmentEmoLevel;}
+            set {FragmentConfig.Instance.FragmentEmoLevel = value;}
+        }
+        private static int fragmentHP {
+            get {return FragmentConfig.Instance.FragmentBonusHP;}
+            set {FragmentConfig.Instance.FragmentBonusHP = value;}
+        }
+        private static int fragmentBP {
+            get {return FragmentConfig.Instance.FragmentBonusStagger;}
+            set {FragmentConfig.Instance.FragmentBonusStagger = value;}
+        }
+        private static bool fragmentActivationHP {
+            get {return FragmentConfig.Instance.FragmentActivationHP;}
+            set {FragmentConfig.Instance.FragmentActivationHP = value;}
+        }
+        private static bool fragmentActivationBP {
+            get {return FragmentConfig.Instance.FragmentActivationStagger;}
+            set {FragmentConfig.Instance.FragmentActivationStagger = value;}
+        }
         private static byte fragmentActivated = 0;
         private bool fragmentStartBP = false;
     }
