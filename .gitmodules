@@ -1,3 +1,4 @@
-[submodule "FinnalBattle"]
-	path = FinnalBattle
-	url = https://github.com/uGuardian/FinnalBattle.git
+[submodule "ConfigAPI"]
+	path = ConfigAPI
+	url = ../ConfigAPI.git
+	update = rebase
