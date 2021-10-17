@@ -1,0 +1,3 @@
+[submodule "FinnalBattle"]
+	path = FinnalBattle
+	url = https://github.com/uGuardian/FinnalBattle.git
