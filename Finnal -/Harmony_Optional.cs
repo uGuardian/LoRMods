@@ -7,7 +7,7 @@ namespace FinallyBeyondTheTime {
 	public class FinallHarmony {
 		public static void Load() {
 			Harmony harmony = new Harmony("LoR.uGuardian.Finnal");
-			Config.HarmonyMode = 1;
+			FinnalConfig.HarmonyMode = 1;
 			CheckSummonLiberation();
 			harmony.PatchAll();
 		}
@@ -18,7 +18,7 @@ namespace FinallyBeyondTheTime {
 			}
 			if (assembly.Contains("BaseMod")) {
 				Debug.Log("Finall: BaseMod Found");
-				Config.HarmonyMode = 2;
+				FinnalConfig.HarmonyMode = 2;
 			}
 		}
 	}
@@ -56,7 +56,7 @@ namespace FinallyBeyondTheTime {
 	[HarmonyPatch(typeof(RencounterManager), "StartRencounter")]
     class EnableNoDelay {
         public static void Postfix(RencounterManager __instance) {
-    		if (Config.instance.DiceSpeedUp == true && Singleton<StageController>.Instance.EnemyStageManager is EnemyTeamStageManager_UltimaAgain) {
+    		if (FinnalConfig.Instance.DiceSpeedUp == true && Singleton<StageController>.Instance.EnemyStageManager is EnemyTeamStageManager_UltimaAgain) {
     			__instance.SetNodelay(true);
     		}
     	}
