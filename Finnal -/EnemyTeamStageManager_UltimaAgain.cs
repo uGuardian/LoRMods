@@ -63,8 +63,8 @@ namespace FinallyBeyondTheTime
 				if (passiveAbilityBase != null && !passiveAbilityBase.destroyed)
 				{
 					List<BattleUnitModel> aliveList = BattleObjectManager.instance.GetAliveList(Faction.Player);
-					Debug.Log("Finall: ChildImmobilizeNerf = "+Config.instance.ChildImmobilizeNerf);
-					if (aliveList.Count > 1 || !Config.instance.ChildImmobilizeNerf && aliveList.Count > 0)
+					Debug.Log("Finall: ChildImmobilizeNerf = "+FinnalConfig.Instance.ChildImmobilizeNerf);
+					if (aliveList.Count > 1 || !FinnalConfig.Instance.ChildImmobilizeNerf && aliveList.Count > 0)
 					{
 						RandomUtil.SelectOne<BattleUnitModel>(aliveList).bufListDetail.AddKeywordBufThisRoundByCard(KeywordBuf.Stun, 1, null);
 						break;
@@ -377,7 +377,7 @@ namespace FinallyBeyondTheTime
 					1306011,
 					1310011
 				};
-				if (Config.instance.PlutoOff == false) {
+				if (FinnalConfig.Instance.PlutoOff == false) {
 					result.Add(1309011);
 					result.Add(1309021);
 				}
@@ -448,7 +448,7 @@ namespace FinallyBeyondTheTime
 					bool loop = false;
 					foreach (int num in this.GetPhaseGuest(this.phase))
 					{
-						// if (Config.HarmonyMode != 2) {
+						// if (FinnalConfig.HarmonyMode != 2) {
 						 	Singleton<StageController>.Instance.AddNewUnit(Faction.Enemy, num, index, -1);
 						// } else {
 						// 	SummonLiberation.Harmony_Patch.SummonUnit(Faction.Enemy, new LorId(num), null, index);
@@ -464,7 +464,7 @@ namespace FinallyBeyondTheTime
 						{
 							this.pt = battleUnitModel;
 						}
-						if (Config.HarmonyMode != 2) {
+						if (FinnalConfig.HarmonyMode != 2) {
 							if (index == 4 && loop == false) {
 								Debug.Log("Finall: Hit capacity, starting alternative fill method.");
 								loop = true;
@@ -485,7 +485,7 @@ namespace FinallyBeyondTheTime
 					int i = 0;
 					foreach (BattleUnitModel battleUnitModel in BattleObjectManager.instance.GetList(Faction.Enemy))
 					{
-						if (Config.HarmonyMode != 2) {
+						if (FinnalConfig.HarmonyMode != 2) {
 							if (i <= 4) {
 								battleUnitModel.index = i;
 								SingletonBehavior<UICharacterRenderer>.Instance.SetCharacter(battleUnitModel.UnitData.unitData, (i+5), true);
@@ -629,7 +629,7 @@ namespace FinallyBeyondTheTime
 			Debug.Log("Finall: Cleaning dead enemies...");
 			int i = 0;
 			if (psuedo == true) {
-				if (Config.HarmonyMode != 2) {
+				if (FinnalConfig.HarmonyMode != 2) {
 					Debug.Log("Finall: Psuedo clean, skipping unregistration");
 				} else {
 					Debug.Log("Finall: Psuedo clean, SummonLiberation active and thusly doing nothing");
@@ -644,12 +644,12 @@ namespace FinallyBeyondTheTime
 						BattleObjectManager.instance.UnregisterUnit(battleUnitModel);
 						// Debug.LogError("Finall: Unregistered Enemy: " + battleUnitModel.id);
 					} else {
-						if (Config.HarmonyMode != 2) {
+						if (FinnalConfig.HarmonyMode != 2) {
 							battleUnitModel.index = 4;
 						}
 					}
 				} else {
-					if (Config.HarmonyMode != 2) {
+					if (FinnalConfig.HarmonyMode != 2) {
 						if (i < 4 || psuedo == false && i == 4) {
 							battleUnitModel.index = i;
 							SingletonBehavior<UICharacterRenderer>.Instance.SetCharacter(battleUnitModel.UnitData.unitData, (i+5), true);
@@ -715,8 +715,8 @@ namespace FinallyBeyondTheTime
 			// Debug.LogError("Finall: PosShuffle: Starting");
 			var unitList = BattleObjectManager.instance.GetAliveList(Faction.Enemy);
 			int maxPoints = unitList.Count;
-			if (Config.instance.ScatterMode == true || gridUnsupportedPhase.Contains(this.phase)) {
-				if (Config.instance.ScatterMode == false) {
+			if (FinnalConfig.Instance.ScatterMode == true || gridUnsupportedPhase.Contains(this.phase)) {
+				if (FinnalConfig.Instance.ScatterMode == false) {
 					Debug.Log("Finall: PosShuffle: Gridmode is not currently supported for this phase");
 				}
 				Debug.Log("Finall: PosShuffle: Using Scattermode");
