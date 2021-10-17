@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<PassiveXmlRoot>
-  <Passive ID="181005">
-    <Rarity>Unique</Rarity>
-    <Cost>0</Cost>
-  </Passive>
-</PassiveXmlRoot>

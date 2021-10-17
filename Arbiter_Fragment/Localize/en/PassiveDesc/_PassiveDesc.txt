@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<PassiveDescRoot xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<PassiveDesc ID="181005">
-		<Name>Fragment of an Arbiter</Name>
-		<Desc>Binah Only: At emotion level 3 changes to buffed version</Desc>
-	</PassiveDesc>
-</PassiveDescRoot>
