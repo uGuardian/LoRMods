@@ -1,1 +1,6 @@
-Your DLLs from LoR (the managed folder) go here.
+Your DLLs go in the sub-folders. (Managed and BepInEx Respectively)
+Managed: steamapps\common\Library Of Ruina\LibraryOfRuina_Data\Managed
+BepInEx: steamapps\common\Library Of Ruina\BepInEx\core
+
+Basemod dll goes directly in libs folder
+Basemod.dll : steamapps\workshop\content\1256670\2603522001\Assemblies\Basemod.dll
