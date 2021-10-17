@@ -4,7 +4,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.6.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arbiter_Fragment", "Arbiter_Fragment\Arbiter_Fragment.csproj", "{75EC60EB-61F9-4ED4-937E-66A83C1946A7}"
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinallyBeyondTheTime", "Finnal -\FinallyBeyondTheTime.csproj", "{4CD9E175-C11A-4C33-8291-05B1CEB86D7A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinallyBeyondTheTime", "FinnalBattle\FinallyBeyondTheTime.csproj", "{4CD9E175-C11A-4C33-8291-05B1CEB86D7A}"
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoSkinLoad", "NoSkinLoad\NoSkinLoad.csproj", "{03A4CA19-43C6-4117-8568-7320E639F306}"
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Steamworks_Updater", "Steamworks_Updater\Steamworks_Updater.csproj", "{E251374C-20AD-4654-98E2-0366C8DC7BCF}"
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigAPI", "ConfigAPI\ConfigAPI.csproj", "{9AD2ECA8-753A-4784-9C60-D5670977245A}"

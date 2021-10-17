@@ -1,3 +1,15 @@
 [submodule "Arbiter_Fragment"]
 	path = Arbiter_Fragment
 	url = https://github.com/uGuardian/Arbiter_Fragment.git
+[submodule "ConfigAPI"]
+	path = ConfigAPI
+	url = https://github.com/uGuardian/ConfigAPI.git
+[submodule "FinnalBattle"]
+	path = FinnalBattle
+	url = https://github.com/uGuardian/FinnalBattle.git
+[submodule "NoSkinLoad"]
+	path = NoSkinLoad
+	url = https://github.com/uGuardian/NoSkinLoad.git
+[submodule "Steamworks_Updater"]
+	path = Steamworks_Updater
+	url = https://github.com/uGuardian/Steamworks_Updater.git
