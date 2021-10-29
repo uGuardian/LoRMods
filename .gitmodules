@@ -6,6 +6,10 @@
 	path = ConfigAPI
 	url = ../ConfigAPI.git
 	update = rebase
+[submodule "CustomMapUtility"]
+	path = CustomMapUtility
+	url = https://github.com/uGuardian/LoR_CustomMapUtility.git
+	update = rebase
 [submodule "FinnalBattle"]
 	path = FinnalBattle
 	url = ../FinnalBattle.git
