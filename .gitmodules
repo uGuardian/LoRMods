@@ -22,3 +22,7 @@
 	path = Steamworks_Updater
 	url = ../Steamworks_Updater.git
 	update = rebase
+[submodule "BBE_Workshop_Patch"]
+	path = BBE_Workshop_Patch
+	url = https://github.com/uGuardian/LoR_BBE_Workshop_Patch.git
+	update = rebase
